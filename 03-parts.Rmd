@@ -1,0 +1,15 @@
+# Hallazgos
+Los hallazgos encontrados en torno al análisis realizado en un capítulo anterior, están en función de una distinción de unos estados de la republica con otros
+
+
+Si hablamos de los casos de covid19, asociando el conjunto de variables correspondientes a esta dimensión, se encontró que la mayoría de los estados concuerdan en cuanto al patrón de estas variables, sin embargo destacan drásticamente los estados de, Estado de México, Jalisco, Nuevo León y Ciudad de México que se logran diferenciar por sus defunciones en casos de covid19, así como en casos confirmados, positivos y negativos, lo cual pudiera poner la pauta para pensar en que estos estados concentraron mayores esfuerzos y presupuesto para la detección de casos de covid19 y que es probable que el nivel de defunciones este en función de la detección y es por eso que en otros estados no se registran los mismos números de defunciones.
+
+En cuanto a ingresos y gastos se puede analizar como existe un patrón de comportamiento en los estados que se encuentran ubicados geográficamente hacia el sur del país en comparación de los que se encuentran en el norte y centro del país.
+
+Si se utiliza la información en torno a la clasificación final de los nuevos grupos con respecto al índice creado a partir de los componentes principales, se observa que los estados que se mantienen alejados son por una parte los que se agruparon en el grupo 1, que son Ciudad de México y Baja california Sur y por otro extremo tenemos a los agrupados en el grupo 3 que son Chiapas y Estado de México, lo cual es un hallazgo que llama mucho la atención ya que tanto en el grupo numero 1 como en el grupo número 3, presenta una agrupación de 1 estado muy grande y donde se concentra mucha de la población del país y que operan como zona central y referente capital dentro del país, con dos estados como lo son Chiapas y Baja California Sur.
+
+De modo que, esto abre la posibilidad para poder realizar una serie de nuevos análisis a partir de estos resultados obtenidos para poder encontrar estos aspectos que logran agrupar a estos 4 estados. Y se hace hincapié en estos dos estados, ya que el resto de los 28 estados se agruparon en un mismo conjunto, por lo que en teoría comparten características, las cuales convendría analizar y descifrar pero que no llaman tanto la atención como estos otros dos grupos.
+
+
+
+

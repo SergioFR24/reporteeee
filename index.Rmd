@@ -1,0 +1,28 @@
+--- 
+title: "Reorte final de estadistica"
+author: "Sergio Fernández Reyes"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+# url: your book url like https://bookdown.org/yihui/bookdown
+description: |
+  Este es un reporte final que tiene como objetivo, mostrar la aplicacion de diversos comandos ejecutados
+  en el software de codigo abierto R Studio,utilizando técnicas de la metodología estadística .
+link-citations: yes
+github-repo: rstudio/bookdown-demo
+---
+
+# Introducción
+
+En este documento se muestra un trabajo categorizado como un reporte de aplicación, constituido como un estudio de tipo transversal. En términos de la metodología estadística, se realizaron análisis de tipo descriptivo básico, exploratorio y multivariado.
+
+En términos de la pertinencia social de este trabajo, se puede decir que la importancia de la realización de este estudio recae en directamente en uno de los problemas más grandes de la actualidad que se trata de la pandemia del virus Sars-Cov2 que ha provocado uno de los hitos más representativos del mundo contemporáneo, dejando a su paso una cantidad nunca antes vista de personas infectadas y fallecidas derivadas de este virus, así como un cambio a nivel de la estructura de la sociedad en todos sus aspectos, esto debido a las medidas de contingencia aplicadas que han modificado sustancialmente aspectos de la vida que ubicábamos como "normales" y consecuentemente han afectado a una serie de variables representativas en la sociedad, como lo son los empleos, la demanda en salud, los ingresos y los gastos de las familias.
+
+En materia nacional, esta situación comenzó a tomar fuerza en México en el mes de marzo reportando el primer caso ante las autoridades sanitarias, de modo que resulta importante poder realizar un análisis de lo que ha ocurrido en nuestro país en función de los datos que se reportan, así como obtener una descripción y relación existente entre las entidades federativas de México en función de las variables mencionadas en el párrafo anterior.
+
+Así mismo es importante mencionar que se ha considerado más que nada la demanda en salud por parte de las familias hacia los servicios particulares en salud, esto con la intención de aterrizar la idea del impacto observable a través de los datos con respecto al ingreso de las familias y como repercute el gasto que sale de sus bolsillos para el cuidado de su salud, es decir, contemplar la idea de que las personas no hagan uso de los servicios en salud públicos, por cualquiera que fuese la razón y que acudieran a los servicios privados, de modo que, en función de los resultados encontrados a partir del análisis se generaría un espacio para pensar si existe o no una una situación de inequidad en términos del modelo de atención a la salud según las variables estudiadas.
+
+Como tal el objetivo general de esta investigación es clasificar las entidades federativas de acuerdo a su condición o a su nivel de asociación entre los casos de covid19 con el gasto, desempleo y demanda en salud de servicios particulares y para lograr este gran objetivo se tienen planteados una serie de objetivos particulares que son, en primer punto seria estimar el gasto, la demanda en salud, los ingresos, el desempleo y los casos de covid19, como segundo objetivo particular es, generar un índice a través de la técnica de componentes principales y como tercer objetivo es, clasificar a las entidades federativas en función de este índice.
+
+

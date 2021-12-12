@@ -1,0 +1,139 @@
+# Metodología  
+### Descripción del apartado metodológico {-}
+
+En términos de la metodología aplicada para este trabajo, será detallada en primer punto por una explicación de la base de datos, no solo en su conformación como tal, sino describiendo el origen de su extracción y la justificación para la utilización de estas.
+
+Por otra parte, se dará una descripción y exploración de las bases de datos a través de del software R Studio, para así mostrar un panorama general en términos descriptivos de la estadística, en cuanto a la conformación de la base de datos.
+
+Como última parte de la metodología se mostrará cuáles serán las técnicas a aplicar para obtener los resultados pertinentes y adecuados al objetivo de la investigación.
+
+
+## Origen y justificacion de los datos
+
+En primer punto se ha decidido la utilización de alguna base de datos que pudiera representar como tal la demanda que hacen las personas en términos de sus cuidados de salud de forma particular, contemplándolo desde la utilización del servicio hasta el gasto empleado en el mismo, por otra parte se buscaba encontrar variables que reflejaran como tal la renta de las familias, de modo que se buscaron variables que mostraran el ingreso de las personas y la forma en la que conseguían estos ingresos, es decir, por trabajo, transferencias, alquileres, entre otras y para que todo este estudio cobre sentido con la problemática contemporánea del covid19, se han buscado los datos de los casos sospechosos, positivos, negativos y defunciones por el virus.
+
+La Clasificación para este análisis seria interestatal, es decir que se van a clasificar todas las variables de acuerdo con una entidad federativa de la república mexicana, las bases de datos se encuentran divididas según cada dimensión que se intenta representar con esas variables. De modo que, las dimensiones son, Casos Covid19, Desempleo, Ingresos, Gastos y demanda en salud en servicios particulares.
+
+Estas bases de datos tuvieron su obtención de diversas fuentes, las cuales se mostrarán en la siguiente tabla:
+
+
+| Dimensiones                      	| Fuente                                                 	|
+|----------------------------------	|--------------------------------------------------------	|
+| Casos covid19                    	| Secretaría de Salud de México                          	|
+| Desempleo                        	| Encuesta Nacional de Ocupación y Empleo                	|
+| Ingresos                         	| Encuesta de Ingreso y Gasto de los Hogares             	|
+| Gastos                           	| Encuesta de Ingreso y Gasto de los Hogares             	|
+| Demanda en salud de particulares 	| Estadísticas de Salud en Establecimientos Particulares 	|
+ <font size="1.5"> Tabla 1.1 
+ 
+ fuente:Elaboración propia </font> 
+
+## Descripcion y exploracion de la base
+
+Como primera parte se cargaran las bases de datos y se muestra un pequeño resumen
+```{r echo=FALSE,results='hide',message=FALSE,warning=FALSE}
+library(readr)
+library(moments)
+library(corrplot)
+library(ggplot2)
+library(psych)
+library(dplyr)
+library(janitor)
+datos_covid <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/Casos covid/datos covid.csv", 
+    col_types = cols(casos_confirm = col_number(), 
+        casos_sospe = col_number(), casos_nega = col_number(), 
+        defun_covid = col_number()))
+pob_ocu <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/Desempleo/pob ocu.csv", 
+    col_types = cols(pob_des = col_number(), 
+        pob_sub = col_number(), pob_ocu = col_number(), 
+        trab_ind = col_number()))
+base_par_csv <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/establecimientos particulares/base par csv.csv", 
+    col_types = cols(consulta_extot = col_number(), 
+        proce_med = col_number(), med_diag = col_number(), 
+        def_par = col_number(), exa_med_diag = col_number(), 
+        egresos = col_number()))
+gasto <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/gastos/gasto.csv", 
+    col_types = cols(gast_tot = col_number(), 
+        alimentos_beb_tab = col_number(), 
+        cuidado_salud = col_number(), transporte = col_number()))
+Ingresos_promedio_por_hogar <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/Ingresos/Ingresos promedio por hogar.csv", 
+    col_types = cols(ingreso_trabajo = col_number(), 
+        ingreso_renta = col_number(), transferencias = col_number(), 
+        alquiler_viv = col_number()))
+
+
+```
+```{r,echo=FALSE}
+str(Ingresos_promedio_por_hogar)
+str(datos_covid)
+str(base_par_csv)
+str(gasto)
+str(pob_ocu)
+
+```
+ Ahora se muestran las primeras cinco lineas de cada una de las bases para conocerlas mejor
+```{r}
+head(datos_covid)
+head(base_par_csv)
+head(gasto)
+head(Ingresos_promedio_por_hogar)
+head(pob_ocu)
+```
+ A continuacion se muestran algunas estadisticas descriptivas de las bases
+```{r}
+summary(base_par_csv)
+summary(datos_covid)
+summary(gasto)
+summary(Ingresos_promedio_por_hogar)
+summary(pob_ocu)
+```
+```{r,echo=FALSE,results='hide',message=FALSE,warning=FALSE,}
+library(aplpack)
+Base_junta <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/Base_junta.csv")
+caras1 <- datos_covid[,-1]
+caras2 <- base_par_csv[,-1]
+caras3 <- gasto[,-1]
+caras4 <- Ingresos_promedio_por_hogar[,-1]
+caras5 <- pob_ocu[,-1]
+
+```
+ 
+A continuacion se mostrara un analisis grafico de caras de Chernoff, con la finalidad de mostrar la similitud entre estados con refrencia a las 5 dimensiones a medir segun sus respesctivas variables asociadas 
+```{r,echo=FALSE}
+faces(caras1,main = "Analisis de caras de Chernoff para los casos de covid19",label = c("aguascalientes","baja","bajasur","campeche","Coahuila","colima","Chiapas","chihuahua","cdmx","durango",
+          "Guanajuato","guerrero","hidalgo","jalisco","edomex","michoacan","morelos","Nayarit","nuevoleon",
+          "oaxaca","puebla","queretaro","qroo","slp","Sinaloa","sonora","tabasco","Tamaulipas","Tlaxcala",
+          "veracruz","yucatan","zacatecas"))
+```
+
+```{r}
+```{r,echo=FALSE}
+faces(caras2,main = "Analisis de caras de Chernoff para la utilizacion de servicios particulares",label = c("aguascalientes","baja","bajasur","campeche","Coahuila","colima","Chiapas","chihuahua","cdmx","durango",
+          "Guanajuato","guerrero","hidalgo","jalisco","edomex","michoacan","morelos","Nayarit","nuevoleon",
+          "oaxaca","puebla","queretaro","qroo","slp","Sinaloa","sonora","tabasco","Tamaulipas","Tlaxcala",
+          "veracruz","yucatan","zacatecas"))
+```
+
+```{r,echo=FALSE}
+faces(caras3,main = "Analisis de caras de Chernoff para el gasto de los hogares",label = c("aguascalientes","baja","bajasur","campeche","Coahuila","colima","Chiapas","chihuahua","cdmx","durango",
+          "Guanajuato","guerrero","hidalgo","jalisco","edomex","michoacan","morelos","Nayarit","nuevoleon",
+          "oaxaca","puebla","queretaro","qroo","slp","Sinaloa","sonora","tabasco","Tamaulipas","Tlaxcala",
+          "veracruz","yucatan","zacatecas"))
+```
+
+```{r,echo=FALSE}
+faces(caras4,main = "Analisis de caras de Chernoff para el ingreso de los hogares",label = c("aguascalientes","baja","bajasur","campeche","Coahuila","colima","Chiapas","chihuahua","cdmx","durango",
+          "Guanajuato","guerrero","hidalgo","jalisco","edomex","michoacan","morelos","Nayarit","nuevoleon",
+          "oaxaca","puebla","queretaro","qroo","slp","Sinaloa","sonora","tabasco","Tamaulipas","Tlaxcala",
+          "veracruz","yucatan","zacatecas"))
+```
+```{r,echo=FALSE}
+faces(caras5,main = "Analisis de caras de Chernoff para el empleo y desempleo ",label = c("aguascalientes","baja","bajasur","campeche","Coahuila","colima","Chiapas","chihuahua","cdmx","durango",
+          "Guanajuato","guerrero","hidalgo","jalisco","edomex","michoacan","morelos","Nayarit","nuevoleon",
+          "oaxaca","puebla","queretaro","qroo","slp","Sinaloa","sonora","tabasco","Tamaulipas","Tlaxcala",
+          "veracruz","yucatan","zacatecas"))
+```
+
+## Metodo estadistico para la obtencion de resultados
+Para este apartado se va a realizar un análisis en términos de la aplicación de una técnica multivariada, la cual para este caso será el análisis de componentes principales, con la intención de poder aplicar un análisis integral que nos dé la posibilidad de descubrir e interpretar la dependencia que existe entre las variables, así mismo examinar las relaciones existentes entre las entidades federativas, evaluar la normalidad multivariada y poder detectar valores atípicos 
+

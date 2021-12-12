@@ -1,0 +1,164 @@
+# Resultados
+```{r,echo=FALSE,results='hide',message=FALSE,warning=FALSE}
+library(readr)
+library(moments)
+library(corrplot)
+library(ggplot2)
+library(psych)
+library(dplyr)
+library(janitor)
+datos_covid <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/Casos covid/datos covid.csv", 
+    col_types = cols(casos_confirm = col_number(), 
+        casos_sospe = col_number(), casos_nega = col_number(), 
+        defun_covid = col_number()))
+pob_ocu <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/Desempleo/pob ocu.csv", 
+    col_types = cols(pob_des = col_number(), 
+        pob_sub = col_number(), pob_ocu = col_number(), 
+        trab_ind = col_number()))
+base_par_csv <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/establecimientos particulares/base par csv.csv", 
+    col_types = cols(consulta_extot = col_number(), 
+        proce_med = col_number(), med_diag = col_number(), 
+        def_par = col_number(), exa_med_diag = col_number(), 
+        egresos = col_number()))
+gasto <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/gastos/gasto.csv", 
+    col_types = cols(gast_tot = col_number(), 
+        alimentos_beb_tab = col_number(), 
+        cuidado_salud = col_number(), transporte = col_number()))
+Ingresos_promedio_por_hogar <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/Ingresos/Ingresos promedio por hogar.csv", 
+    col_types = cols(ingreso_trabajo = col_number(), 
+        ingreso_renta = col_number(), transferencias = col_number(), 
+        alquiler_viv = col_number()))
+Base_junta <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/Base_junta.csv")
+```
+En primer punto se exploraran los datos en un analisis grafico de caja de alambres para observar la variabilidad de los datos
+```{r,echo=FALSE}
+base22 <- Base_junta[,-1]
+boxplot(base22, main = "Analis gráfico de caja de alambres para la bases de datos conjunta")
+
+
+```
+
+Ahora se haran una serie de pruebas para evaluar la normalidad de los datos
+```{r,echo=FALSE,error=FALSE,warning=FALSE}
+library(MVN)
+Result <- mvn(base22, mvnTest="mardia")
+
+```
+```{r,echo=FALSE}
+Result
+```
+Se aplico la prueba de normalidad multivariada de Mardia y como un anexo para el analisis se muestran los resultados de la prueba de Anderson Darling
+
+Posteriormente se aplico la metodologia correspondiente para la obtencion de variables outliers
+```{r,echo=FALSE}
+outliers <- mvn(base22, mvnTest = "hz", multivariateOutlierMethod = "quan")
+outliers
+
+```
+Ahora se aplica la prueba de normalidad multivariada de Royston 
+```{r,echo=FALSE}
+royston_test <- mvn(base22, mvnTest = "royston", multivariatePlot = "qq")
+royston_test$multivariateNormality
+```
+
+Ahora se muestra el determinante de la matriz de correlaciones para observar si es factible o no realizar el analisis de componentes principales, ya que si ocurriera el caso de que el determinante fuera igual a 0 entonces no seria factible realizarlo
+
+```{r,echo=FALSE}
+MR<-round(cor(base22),2)
+det(MR)
+```
+```{r,echo=FALSE}
+library(psych)
+```
+
+Ahora se aplicara el Test de esferacidad de Bartlett para probar si la matriz de corrrelaciones es igual a la matriz de identidad o si las matrices son diferentes
+
+```{r,echo=FALSE}
+print(cortest.bartlett(MR, nrow(base22)))
+```
+Ahora se aplicara el criterio de Kaiser-Meyer-Olkin para mirar si los datos son adecuados para el analisis de componentes principales
+```{r}
+KMO(MR)
+```
+Ahora se obtendran los componentes principales a traves de la matriz de correlaciones
+```{r,echo=FALSE}
+var(base22)
+compo<-princomp(base22,cor=T)
+compo
+```
+Aqui se utiliza una instruccion diferente para obtener los componentes que lo hace con la matriz de varianza y de covarianza
+```{r,echo=FALSE}
+acp <- prcomp(base22)
+acp
+```
+Aqui se reporta la importancia de cada uno de los componentes
+```{r,echo=FALSE}
+summary(compo)
+```
+Ahora se obtienen los pesos en vectores propios asociados a los componentes principales
+```{r,echo=FALSE}
+cargas<-loadings(compo) 
+cargas
+pesos<-cargas[,1:22]
+pesos
+```
+Puntuaciones de los componentes principales
+```{r,echo=FALSE}
+compo$scores
+```
+Gráfico de los componentes
+```{r,echo=FALSE}
+plot(compo,main = "componentes principales")
+```
+Bitplot de los primeros dos componentes
+```{r,echo=FALSE}
+biplot(compo)
+```
+Ahora se procedera a crear el indice en funcion de los primeros 4 componentes, que segun el analisis nos explican aproximadamente el 84% del problema
+
+```{r,echo=FALSE}
+
+cpuno<-compo$loadings[,1]
+NVcp1<-cpuno[1]*base22$casos_confirm+cpuno[2]*base22$casos_sospe+cpuno[3]*base22$casos_nega+cpuno[4]*base22$defun_covid+cpuno[5]*base22$pob_des+cpuno[6]*base22$pob_sub+cpuno[7]*base22$pob_ocu+cpuno[8]*base22$trab_ind+cpuno[9]*base22$consulta_extot+cpuno[10]*base22$proce_med+cpuno[11]*base22$med_diag+cpuno[12]*base22$def_par+cpuno[13]*base22$exa_med_diag+cpuno[14]*base22$egresos+cpuno[15]*base22$gast_tot+cpuno[16]*base22$alimentos_beb_tab+cpuno[17]*base22$cuidado_salud+cpuno[18]*base22$transporte+cpuno[19]*base22$ingreso_trabajo+cpuno[20]*base22$ingreso_renta+cpuno[21]*base22$transferencias+cpuno[22]*base22$alquiler_viv
+
+cpdos<-compo$loadings[,2]
+NVcp2<-cpdos[1]*base22$casos_confirm+cpdos[2]*base22$casos_sospe+cpdos[3]*base22$casos_nega+cpdos[4]*base22$defun_covid+cpdos[5]*base22$pob_des+cpdos[6]*base22$pob_sub+cpdos[7]*base22$pob_ocu+cpdos[8]*base22$trab_ind+cpdos[9]*base22$consulta_extot+cpdos[10]*base22$proce_med+cpdos[11]*base22$med_diag+cpdos[12]*base22$def_par+cpdos[13]*base22$exa_med_diag+cpdos[14]*base22$egresos+cpdos[15]*base22$gast_tot+cpdos[16]*base22$alimentos_beb_tab+cpdos[17]*base22$cuidado_salud+cpdos[18]*base22$transporte+cpdos[19]*base22$ingreso_trabajo+cpdos[20]*base22$ingreso_renta+cpdos[21]*base22$transferencias+cpdos[22]*base22$alquiler_viv
+
+cptres<-compo$loadings[,3]
+NVcp3<-cptres[1]*base22$casos_confirm+cptres[2]*base22$casos_sospe+cptres[3]*base22$casos_nega+cptres[4]*base22$defun_covid+cptres[5]*base22$pob_des+cptres[6]*base22$pob_sub+cptres[7]*base22$pob_ocu+cptres[8]*base22$trab_ind+cptres[9]*base22$consulta_extot+cptres[10]*base22$proce_med+cptres[11]*base22$med_diag+cptres[12]*base22$def_par+cptres[13]*base22$exa_med_diag+cptres[14]*base22$egresos+cptres[15]*base22$gast_tot+cptres[16]*base22$alimentos_beb_tab+cptres[17]*base22$cuidado_salud+cptres[18]*base22$transporte+cptres[19]*base22$ingreso_trabajo+cptres[20]*base22$ingreso_renta+cptres[21]*base22$transferencias+cptres[22]*base22$alquiler_viv
+
+cpcuatro<-compo$loadings[,4]
+NVcp3<-cpcuatro[1]*base22$casos_confirm+cpcuatro[2]*base22$casos_sospe+cpcuatro[3]*base22$casos_nega+cpcuatro[4]*base22$defun_covid+cpcuatro[5]*base22$pob_des+cpcuatro[6]*base22$pob_sub+cpcuatro[7]*base22$pob_ocu+cpcuatro[8]*base22$trab_ind+cpcuatro[9]*base22$consulta_extot+cpcuatro[10]*base22$proce_med+cpcuatro[11]*base22$med_diag+cpcuatro[12]*base22$def_par+cpcuatro[13]*base22$exa_med_diag+cpcuatro[14]*base22$egresos+cpcuatro[15]*base22$gast_tot+cpcuatro[16]*base22$alimentos_beb_tab+cpcuatro[17]*base22$cuidado_salud+cpcuatro[18]*base22$transporte+cpcuatro[19]*base22$ingreso_trabajo+cpcuatro[20]*base22$ingreso_renta+cpcuatro[21]*base22$transferencias+cpcuatro[22]*base22$alquiler_viv
+
+ ZX=scale(base22) 
+ ZX%*%pesos
+
+
+```
+Para obtener el indice se saca el primer compinente con su respectiva desviacion estandar
+```{r,echo=FALSE}
+compo$sdev[1]
+compo$loadings[,1]
+cpest<-compo$loadings[,1]/compo$sdev[1]
+cpest
+```
+Posteriormente se calcula el indice 
+```{r}
+Indice<-cpest[1]*ZX[,1]+cpest[2]*ZX[,2]+cpest[3]*ZX[,3]+cpest[4]*ZX[,4]
+Indice
+
+```
+Posteriormente se combina el indice con la base de datos original, como una nueva columna
+```{r,echo=FALSE}
+base25<-cbind(base22,Indice)
+base25
+```
+Como paso final se utiliza la metodologia de estratificacion geometrica utilizando el nuevo indice para poder estratificar en 3 grupos
+```{r,echo=FALSE,results='hide',message=FALSE,warning=FALSE}
+Base_junta2 <- read_csv("~/eSPECIALIZACION m.ESTADISTICOS/proyecto/revision_tesis_sergio/bases de datos/Base_junta2.csv")
+
+```
+```{r,echo=FALSE}
+plot(Base_junta2$`Grupo final`,type = "h",xlab = "Estados segun codigo", ylab = "grupo en el que se le clasifico")
+```
+
